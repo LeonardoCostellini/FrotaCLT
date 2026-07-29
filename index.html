@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>FrotaCTL — Gestão de Frotas</title>
+  <!-- Ícone padrão (genérico). É atualizado automaticamente pelo JS se um logotipo
+       for cadastrado em Sistema > Personalização. -->
+  <link rel="icon" type="image/svg+xml" data-default="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Crect width='34' height='34' rx='8' fill='%230055FF'/%3E%3Cpath d='M6 22V13a2 2 0 012-2h9l4 4v7' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='12' cy='24' r='2.4' fill='white'/%3E%3Ccircle cx='23' cy='24' r='2.4' fill='white'/%3E%3C/svg%3E"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Crect width='34' height='34' rx='8' fill='%230055FF'/%3E%3Cpath d='M6 22V13a2 2 0 012-2h9l4 4v7' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='12' cy='24' r='2.4' fill='white'/%3E%3Ccircle cx='23' cy='24' r='2.4' fill='white'/%3E%3C/svg%3E" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+  <link rel="stylesheet" href="style.css?v=20260729a" />
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-hero">
+
+    <div class="login-hero-bg" aria-hidden="true">
+      <div class="lhb-glow lhb-glow-1"></div>
+      <div class="lhb-glow lhb-glow-2"></div>
+      <div class="lhb-grid"></div>
+    </div>
+
+    <header class="login-hero-header">
+      <div class="login-hero-brand">
+        <div class="login-logo-wrap">
+          <!-- Logotipo customizado (Sistema > Personalização). Some se nenhum for cadastrado. -->
+          <img class="app-logo-img" alt="Logotipo" style="display:none" />
+          <svg class="app-logo-fallback" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="34" height="34" rx="8" fill="var(--accent, #0055FF)"/>
+            <text x="17" y="23" text-anchor="middle" font-family="Arial" font-size="14" font-weight="800" fill="white" class="app-logo-fallback-initial">FC</text>
+          </svg>
+        </div>
+        <span class="login-hero-brand-name brand-name">FrotaCTL</span>
+      </div>
+      <span class="login-hero-eyebrow">Sistema Interno · Gestão de Frotas</span>
+    </header>
+
+    <div class="login-hero-body">
+      <div class="login-hero-left">
+        <span class="login-hero-tag">Gestão completa da sua frota, em um só lugar</span>
+        <h1 class="login-hero-title">Sistema de Gestão<br>de Frotas.</h1>
+        <p class="login-hero-desc">Da atribuição de veículos e motoristas às maletas de ferramentas, abastecimento, manutenção e troca de óleo — cada operação registrada e auditável, empresa por empresa.</p>
+
+        <ul class="login-hero-points">
+          <li><svg viewBox="0 0 20 20" fill="none"><path d="M10 2v4M10 14v4M2 10h4M14 10h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.6"/></svg>Atribuição de veículos, motoristas e maletas de ferramentas</li>
+          <li><svg viewBox="0 0 20 20" fill="none"><path d="M3 10l4 4L17 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Checklist de inspeção, manutenção e troca de óleo</li>
+          <li><svg viewBox="0 0 20 20" fill="none"><path d="M4 15V9m6 6V5m6 10v-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Auditoria e relatórios por empresa</li>
+        </ul>
+
+        <div class="login-card">
+          <h2 class="login-card-title">Acesse sua conta</h2>
+          <form id="login-form" onsubmit="submitLogin(event)">
+            <div class="field" style="margin-bottom:14px;">
+              <label>Usuário</label>
+              <input type="text" id="login-username" autocomplete="username" required autofocus>
+            </div>
+            <div class="field" style="margin-bottom:6px;">
+              <label>Senha</label>
+              <input type="password" id="login-password" autocomplete="current-password" required>
+            </div>
+            <div id="login-error" class="login-error" style="display:none"></div>
+            <button type="submit" class="btn btn-primary login-submit-btn">
+              <span>Entrar</span>
+              <svg viewBox="0 0 20 20" fill="none" width="15" height="15"><path d="M4 10h11m0 0-4-4m4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </form>
+          <p class="login-card-hint">Acesso restrito a usuários autorizados.</p>
+        </div>
+      </div>
+
+      <div class="login-hero-right" aria-hidden="true">
+        <div class="lh-mock">
+          <div class="lh-mock-card lh-mock-kpi lh-float-1">
+            <div class="lh-mock-kpi-icon">
+              <svg viewBox="0 0 20 20" fill="none" width="18" height="18"><path d="M3 12l1.5-5A2 2 0 0 1 6.4 5.5h7.2a2 2 0 0 1 1.9 1.5L17 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="2.5" y="12" width="15" height="4" rx="1.4" stroke="currentColor" stroke-width="1.5"/><circle cx="6" cy="16" r="1" fill="currentColor"/><circle cx="14" cy="16" r="1" fill="currentColor"/></svg>
+            </div>
+            <div>
+              <div class="lh-mock-kpi-label">Veículos ativos</div>
+              <div class="lh-mock-kpi-value">128</div>
+            </div>
+          </div>
+
+          <div class="lh-mock-card lh-mock-chart lh-float-2">
+            <div class="lh-mock-chart-head">
+              <span>Custos por período</span>
+              <span class="lh-mock-chart-trend">↓ 12%</span>
+            </div>
+            <div class="lh-mock-chart-bars">
+              <span style="--h:38%"></span><span style="--h:55%"></span><span style="--h:44%"></span>
+              <span style="--h:70%"></span><span style="--h:52%"></span><span style="--h:80%"></span><span style="--h:60%"></span>
+            </div>
+          </div>
+
+          <div class="lh-mock-card lh-mock-status lh-float-3">
+            <span class="lh-dot"></span> Frota operacional <strong>98%</strong>
+          </div>
+
+          <div class="lh-mock-card lh-mock-mini lh-float-4">
+            <svg viewBox="0 0 20 20" fill="none" width="15" height="15"><path d="M10 2 3 6v7l7 4 7-4V6l-7-4Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Manutenções em dia
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="login-hero-footer">
+      <span>Desenvolvido por Leonardo Costellini © 2026. Todos os direitos reservados.</span>
+    </footer>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-logo-wrap">
+      <!-- Logotipo customizado (Sistema > Personalização). Sem upload = mostra as iniciais. -->
+      <img class="app-logo-img" alt="Logotipo" style="display:none" />
+      <svg class="app-logo-fallback" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="34" height="34" rx="8" fill="var(--accent, #0055FF)"/>
+        <text x="17" y="23" text-anchor="middle" font-family="Arial" font-size="14" font-weight="800" fill="white" class="app-logo-fallback-initial">FC</text>
+      </svg>
+    </div>
+    <div class="brand-text">
+      <span class="brand-name">FrotaCTL</span>
+      <span class="brand-sub">Gestão de Frotas</span>
+    </div>
+    <button class="sidebar-toggle-btn" id="sidebarToggle" title="Recolher / Expandir menu">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4H14M2 8H14M2 12H14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <nav class="sidebar-nav">
+    <span class="nav-section">Painel</span>
+    <button class="nav-item active" data-page="dashboard" data-tooltip="Dashboard">
+      <svg viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="11" y="2" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="2" y="11" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="11" y="11" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/></svg>
+      <span class="nav-label">Dashboard</span>
+    </button>
+    <button class="nav-item" data-page="alerts" data-tooltip="Central de Alertas">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M10 2.5c-2.5 0-4 2-4 4.5v2.7c0 .6-.2 1.2-.6 1.7l-.9 1.1c-.5.6-.1 1.5.7 1.5h9.6c.8 0 1.2-.9.7-1.5l-.9-1.1c-.4-.5-.6-1.1-.6-1.7V7c0-2.5-1.5-4.5-4-4.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 16.5a2 2 0 004 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span class="nav-label">Central de Alertas</span>
+      <span class="nav-badge" id="alerts-page-badge" style="display:none;"></span>
+    </button>
+
+    <span class="nav-section">Cadastros</span>
+    <button class="nav-item" data-page="vehicles" data-tooltip="Veículos">
+      <svg viewBox="0 0 20 20" fill="none"><rect x="1" y="8" width="18" height="8" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3 8L5.5 4H14.5L17 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="6" cy="16" r="2" fill="currentColor"/><circle cx="14" cy="16" r="2" fill="currentColor"/></svg>
+      <span class="nav-label">Veículos</span>
+    </button>
+    <button class="nav-item" data-page="drivers" data-tooltip="Motoristas">
+      <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M2 18c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span class="nav-label">Motoristas</span>
+    </button>
+    <button class="nav-item" data-page="briefcases" data-tooltip="Maletas">
+      <svg viewBox="0 0 20 20" fill="none"><rect x="2" y="7" width="16" height="11" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M7 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M2 12h16" stroke="currentColor" stroke-width="1.4"/></svg>
+      <span class="nav-label">Maletas</span>
+    </button>
+
+    <span class="nav-section">Viagens</span>
+    <button class="nav-item" data-page="trips" data-tooltip="Viagens">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M2 15.5c1.5-4 3-9 4.5-11.5a2 2 0 013.4 0c1.5 2.5 3 7.5 4.5 11.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.3 11h9.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="16.5" cy="14.5" r="2.5" stroke="currentColor" stroke-width="1.6"/></svg>
+      <span class="nav-label">Viagens</span>
+    </button>
+    <button class="nav-item" data-page="schedule" data-tooltip="Agenda de Reservas">
+      <svg viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M2 8h16" stroke="currentColor" stroke-width="1.4"/><path d="M6 2v3M14 2v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M6 12h2M10 12h2M6 15h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <span class="nav-label">Agenda</span>
+    </button>
+    <button class="nav-item" data-page="inspection" data-tooltip="Vistoria do Veículo">
+      <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="2" width="14" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M6.5 7l2 2 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.5 13h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <span class="nav-label">Vistoria do Veículo</span>
+    </button>
+
+    <span class="nav-section">Operações</span>
+    <button class="nav-item" data-page="assignments" data-tooltip="Atribuições">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M19 10H1M14 4l5 6-5 6M6 4L1 10l5 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="nav-label">Atribuições</span>
+    </button>
+    <button class="nav-item" data-page="fuel" data-tooltip="Abastecimentos">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M4 18V6a1 1 0 011-1h7a1 1 0 011 1v12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M2 18h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M13 8l3-2 2 2v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><rect x="6" y="8" width="5" height="3" rx="0.5" stroke="currentColor" stroke-width="1.4"/></svg>
+      <span class="nav-label">Abastecimentos</span>
+    </button>
+    <button class="nav-item" data-page="maintenance" data-tooltip="Manutenções">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M16.5 3.5l-3.5 3.5-1.5 2.5 2.5-1.5 3.5-3.5a2 2 0 00-2.8-2.8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 6L2 13l5 5 7-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="nav-label">Manutenções</span>
+    </button>
+    <button class="nav-item" data-page="oil" data-tooltip="Troca de Óleo">
+      <svg viewBox="0 0 20 20" fill="none"><ellipse cx="10" cy="6" rx="7" ry="3" stroke="currentColor" stroke-width="1.6"/><path d="M17 10c0 1.657-3.134 3-7 3S3 11.657 3 10" stroke="currentColor" stroke-width="1.6"/><path d="M3 6v8c0 1.657 3.134 3 7 3s7-1.343 7-3V6" stroke="currentColor" stroke-width="1.6"/></svg>
+      <span class="nav-label">Troca de Óleo</span>
+    </button>
+    <button class="nav-item" data-page="fines" data-tooltip="Multas">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M4 3h10l3 3v11a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 9h6M7 12h6M7 15h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <span class="nav-label">Multas</span>
+    </button>
+    <span class="nav-section">Maletas</span>
+    <button class="nav-item" data-page="weekly-terms" data-tooltip="Termo da Maleta">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M5 2h10v16l-5-3-5 3V2z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M7.5 7l2 2 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="nav-label">Termo da Maleta</span>
+    </button>
+    <button class="nav-item" data-page="briefcase-return" data-tooltip="Devolução Final (Desligamento)">
+      <svg viewBox="0 0 20 20" fill="none"><rect x="2" y="7" width="16" height="11" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M7 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M7 13l2 2 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="nav-label">Dev. Maleta</span>
+    </button>
+
+    <span class="nav-section">Ferramentas</span>
+    <button class="nav-item" data-page="temp-items" data-tooltip="Ferramentas de Uso Comum">
+      <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="8" width="14" height="9" rx="1.5" stroke="currentColor" stroke-width="1.6"/><path d="M3 8l2.5-4.5h9L17 8" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 8v3M12 8v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <span class="nav-label">Ferramentas de Uso Comum</span>
+    </button>
+
+    <span class="nav-section">Análise</span>
+    <button class="nav-item" data-page="reports" data-tooltip="Relatórios">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M16 2H7a2 2 0 00-2 2v12a2 2 0 002 2h9a2 2 0 002-2V4a2 2 0 00-2-2z" stroke="currentColor" stroke-width="1.6"/><path d="M9 8h6M9 11h6M9 14h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M4 5H3a2 2 0 00-2 2v9a2 2 0 002 2h1" stroke="currentColor" stroke-width="1.4"/></svg>
+      <span class="nav-label">Relatórios</span>
+    </button>
+    <button class="nav-item" data-page="adv-reports" data-tooltip="Análise Avançada">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M2 17V9M7 17V3M12 17v-6M17 17V6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      <span class="nav-label">Análise Avançada</span>
+    </button>
+
+    <span class="nav-section">Sistema</span>
+    <button class="nav-item" data-page="personalizacao" data-tooltip="Personalização">
+      <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="2.6" stroke="currentColor" stroke-width="1.6"/><path d="M10 2.5v2.4M10 15.1v2.4M17.5 10h-2.4M4.9 10H2.5M15.1 4.9l-1.7 1.7M6.6 13.4l-1.7 1.7M15.1 15.1l-1.7-1.7M6.6 6.6L4.9 4.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span class="nav-label">Personalização</span>
+    </button>
+    <button class="nav-item" data-page="companies" data-tooltip="Empresas" data-role-gate="admin_geral">
+      <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="6" height="14" stroke="currentColor" stroke-width="1.6"/><rect x="11" y="7" width="6" height="10" stroke="currentColor" stroke-width="1.6"/><path d="M5.5 6h1M5.5 9h1M5.5 12h1M13.5 10h1M13.5 13h1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <span class="nav-label">Empresas</span>
+    </button>
+    <button class="nav-item" data-page="users" data-tooltip="Usuários" data-role-gate="admin">
+      <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="6.5" r="3.5" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 17c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span class="nav-label">Usuários</span>
+    </button>
+    <button class="nav-item" data-page="audit" data-tooltip="Auditoria" data-role-gate="admin">
+      <svg viewBox="0 0 20 20" fill="none"><circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.6"/><path d="M12.7 12.7L17 17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M8.5 6v2.8l1.8 1.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="nav-label">Auditoria</span>
+    </button>
+    <button class="nav-item" data-page="backup" data-tooltip="Backup & Restauração" data-role-gate="admin">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M5.5 8.5a4 4 0 013.9-5 4.5 4.5 0 018.4 1.8A3.5 3.5 0 0117 12.5H6a3.5 3.5 0 01-.5-6.96z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 9v6.5M7.5 13l2.5 2.5 2.5-2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="nav-label">Backup & Restauração</span>
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="conn-indicator" id="conn-indicator">
+      <span class="conn-dot" id="conn-dot"></span>
+      <span class="conn-label" id="conn-label">Verificando...</span>
+    </div>
+    <div class="sidebar-version" id="sidebar-version-text">v1.0 · FrotaCTL</div>
+  </div>
+</aside>
+
+<div class="overlay" id="overlay"></div>
+
+<!-- MAIN -->
+<div class="main-wrapper" id="mainWrapper">
+  <header class="topbar">
+    <button class="topbar-menu" id="menu-toggle">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 5H17M3 10H17M3 15H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <div class="topbar-breadcrumb">
+      <!-- Logo no topbar (visível mobile) — segue a Personalização, some se não houver logotipo -->
+      <img class="topbar-logo app-logo-img" alt="Logotipo" style="display:none" />
+      <span class="topbar-brand-mini">FrotaCTL</span>
+      <span class="topbar-sep">/</span>
+      <span class="topbar-title" id="topbar-title">Dashboard</span>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-date" id="topbar-date"></div>
+      <div class="company-badge" id="company-badge"></div>
+      <div class="user-badge" id="user-badge" onclick="toggleUserMenu()">
+        <img id="user-badge-avatar" class="user-badge-avatar" style="display:none;">
+        <span class="user-badge-name" id="user-badge-name">—</span>
+        <span class="user-badge-role" id="user-badge-role">—</span>
+        <div class="user-menu" id="user-menu">
+          <button type="button" onclick="logout()">🚪 Sair</button>
+        </div>
+      </div>
+      <button class="topbar-theme-btn" id="themeToggle" title="Alternar tema">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3.05 3.05l1.06 1.06M11.89 11.89l1.06 1.06M3.05 12.95l1.06-1.06M11.89 4.11l1.06-1.06" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="main-content">
+
+    <!-- ===== DASHBOARD ===== -->
+    <section class="page active" id="dashboard-page">
+
+      <!-- Dashboard Header with period filter -->
+      <div class="dash-topbar">
+        <div class="dash-topbar-left">
+          <h1 class="page-title">Dashboard</h1>
+          <p class="page-desc" id="dash-subtitle">Carregando dados da frota...</p>
+        </div>
+        <div class="dash-topbar-right">
+          <div class="dash-period-tabs" id="dash-period-tabs">
+            <button class="dpt-btn active" data-period="month" onclick="setDashPeriod('month',this)">Este Mês</button>
+            <button class="dpt-btn" data-period="quarter" onclick="setDashPeriod('quarter',this)">Trimestre</button>
+            <button class="dpt-btn" data-period="year" onclick="setDashPeriod('year',this)">Ano</button>
+            <button class="dpt-btn" data-period="all" onclick="setDashPeriod('all',this)">Tudo</button>
+            <button class="dpt-btn" data-period="custom" onclick="setDashPeriod('custom',this)">Período Específico</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Custom period range picker (shown only when "Período Específico" is selected) -->
+      <div class="dash-custom-period-row" id="dash-custom-period-row" style="display:none">
+        <div class="field"><label>De</label><input type="date" id="dash-custom-from" onchange="applyDashCustomPeriod()"></div>
+        <div class="field"><label>Até</label><input type="date" id="dash-custom-to" onchange="applyDashCustomPeriod()"></div>
+        <button type="button" class="btn btn-primary btn-sm" onclick="applyDashCustomPeriod()">Aplicar</button>
+      </div>
+
+      <!-- Alert Banner -->
+      <div id="dash-alerts"></div>
+
+      <!-- KPI Row 1: Frota -->
+      <div class="dash-section-label">Visão Geral da Frota</div>
+      <div class="kpi-grid kpi-grid-6">
+        <div class="kpi-card kpi-blue">
+          <div class="kpi-icon-wrap kpi-icon-blue">
+            <svg viewBox="0 0 20 20" fill="none"><rect x="1" y="8" width="18" height="8" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3 8L5.5 4H14.5L17 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="6" cy="16" r="2" fill="currentColor"/><circle cx="14" cy="16" r="2" fill="currentColor"/></svg>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">Veículos Ativos</div>
+            <div class="kpi-value" id="kpi-v">0</div>
+            <div class="kpi-sub" id="kpi-v-sub">cadastrados</div>
+          </div>
+        </div>
+        <div class="kpi-card kpi-indigo">
+          <div class="kpi-icon-wrap kpi-icon-indigo">
+            <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M2 18c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">Motoristas</div>
+            <div class="kpi-value" id="kpi-d">0</div>
+            <div class="kpi-sub" id="kpi-d-sub">cadastrados</div>
+          </div>
+        </div>
+        <div class="kpi-card kpi-emerald">
+          <div class="kpi-icon-wrap kpi-icon-emerald">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M3 10l5 5L17 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">Em Uso Agora</div>
+            <div class="kpi-value" id="kpi-inuse">0</div>
+            <div class="kpi-sub" id="kpi-inuse-sub">veículo(s)</div>
+          </div>
+        </div>
+        <div class="kpi-card kpi-amber">
+          <div class="kpi-icon-wrap kpi-icon-amber">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M16.5 3.5l-3.5 3.5-1.5 2.5 2.5-1.5 3.5-3.5a2 2 0 00-2.8-2.8z" stroke="currentColor" stroke-width="1.5"/><path d="M9 6L2 13l5 5 7-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">Manutenções</div>
+            <div class="kpi-value" id="kpi-maint-count">0</div>
+            <div class="kpi-sub" id="kpi-maint-sub">no período</div>
+          </div>
+        </div>
+        <div class="kpi-card kpi-cyan">
+          <div class="kpi-icon-wrap kpi-icon-cyan">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M4 18V6a1 1 0 011-1h7a1 1 0 011 1v12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M2 18h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M13 8l3-2 2 2v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">Abastecimentos</div>
+            <div class="kpi-value" id="kpi-fuel-liters">0 L</div>
+            <div class="kpi-sub" id="kpi-fuel-sub">no período</div>
+          </div>
+        </div>
+        <div class="kpi-card kpi-rose">
+          <div class="kpi-icon-wrap kpi-icon-rose">
+            <svg viewBox="0 0 20 20" fill="none"><line x1="10" y1="1" x2="10" y2="19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M14 4H8.5a3.5 3.5 0 000 7h3a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-label">Custo Total</div>
+            <div class="kpi-value" id="kpi-tc">R$ 0</div>
+            <div class="kpi-sub">combustível + manutenção + óleo</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI Row 2: Custos -->
+      <div class="dash-section-label">Custos por Categoria</div>
+      <div class="kpi-grid kpi-grid-4">
+        <div class="kpi-card kpi-flat">
+          <div class="kpi-flat-left">
+            <div class="kpi-flat-dot" style="background:#0891B2"></div>
+            <div>
+              <div class="kpi-flat-label">Combustível</div>
+              <div class="kpi-flat-value" id="kpi-fc">R$ 0,00</div>
+            </div>
+          </div>
+          <div class="kpi-flat-bar"><div class="kpi-flat-bar-fill" id="kpi-fc-bar" style="width:0%;background:#0891B2"></div></div>
+        </div>
+        <div class="kpi-card kpi-flat">
+          <div class="kpi-flat-left">
+            <div class="kpi-flat-dot" style="background:#CA8A04"></div>
+            <div>
+              <div class="kpi-flat-label">Manutenção</div>
+              <div class="kpi-flat-value" id="kpi-mc">R$ 0,00</div>
+            </div>
+          </div>
+          <div class="kpi-flat-bar"><div class="kpi-flat-bar-fill" id="kpi-mc-bar" style="width:0%;background:#CA8A04"></div></div>
+        </div>
+        <div class="kpi-card kpi-flat">
+          <div class="kpi-flat-left">
+            <div class="kpi-flat-dot" style="background:#EA580C"></div>
+            <div>
+              <div class="kpi-flat-label">Troca de Óleo</div>
+              <div class="kpi-flat-value" id="kpi-oc">R$ 0,00</div>
+            </div>
+          </div>
+          <div class="kpi-flat-bar"><div class="kpi-flat-bar-fill" id="kpi-oc-bar" style="width:0%;background:#EA580C"></div></div>
+        </div>
+        <div class="kpi-card kpi-flat">
+          <div class="kpi-flat-left">
+            <div class="kpi-flat-dot" style="background:#7C3AED"></div>
+            <div>
+              <div class="kpi-flat-label">KM Total Rodado</div>
+              <div class="kpi-flat-value" id="kpi-km">0 km</div>
+            </div>
+          </div>
+          <div class="kpi-flat-bar"><div class="kpi-flat-bar-fill" id="kpi-km-bar" style="width:0%;background:#7C3AED"></div></div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="dash-section-label">Análise Gráfica</div>
+      <div class="dash-charts-row">
+        <div class="panel dash-chart-main" data-collapse-key="chart-cost">
+          <div class="panel-header">
+            <span class="panel-title">Custo Mensal por Categoria</span>
+            <div class="panel-header-right">
+              <div class="chart-tab-group">
+                <button class="chart-tab active" onclick="switchCostChart('monthly',this)">Mensal</button>
+                <button class="chart-tab" onclick="switchCostChart('vehicle',this)">Por Veículo</button>
+              </div>
+            </div>
+          </div>
+          <div class="panel-body"><div class="chart-wrap"><canvas id="chart-costs"></canvas></div></div>
+        </div>
+        <div class="panel dash-chart-side" data-collapse-key="chart-fuel">
+          <div class="panel-header">
+            <span class="panel-title">Consumo de Combustível (L)</span>
+            <div class="panel-header-right">
+              <div class="chart-tab-group">
+                <button class="chart-tab active" onclick="switchFuelChart('monthly',this)">Mensal</button>
+                <button class="chart-tab" onclick="switchFuelChart('vehicle',this)">Por Veículo</button>
+              </div>
+            </div>
+          </div>
+          <div class="panel-body"><div class="chart-wrap"><canvas id="chart-fuel"></canvas></div></div>
+        </div>
+      </div>
+
+      <!-- Bottom Row: Rankings + Alerts + Activity -->
+      <div class="dash-bottom-row">
+
+        <!-- Ranking de veículos por custo -->
+        <div class="panel dash-ranking-panel" data-collapse-key="ranking">
+          <div class="panel-header">
+            <span class="panel-title">Ranking de Custos</span>
+            <div class="panel-header-right">
+              <span class="panel-badge" id="ranking-period-label">Este mês</span>
+            </div>
+          </div>
+          <div id="cost-ranking-list" class="cost-ranking-list"></div>
+        </div>
+
+        <!-- Alerts & Próximas -->
+        <div class="panel dash-alerts-panel" data-collapse-key="alerts">
+          <div class="panel-header">
+            <span class="panel-title">Alertas & Pendências</span>
+            <div class="panel-header-right">
+              <span class="panel-badge danger" id="alert-count-badge" style="display:none">0</span>
+            </div>
+          </div>
+          <div id="dash-alerts-detail" class="dash-alerts-detail"></div>
+        </div>
+
+        <!-- Activity feed -->
+        <div class="panel dash-activity-panel" data-collapse-key="activity">
+          <div class="panel-header">
+            <span class="panel-title">Últimas Movimentações</span>
+          </div>
+          <div id="activity-list" class="activity-list"></div>
+        </div>
+      </div>
+
+      <!-- Vehicle Status Grid -->
+      <div class="dash-section-label">Status da Frota</div>
+      <div id="vehicle-status-grid" class="vehicle-status-grid"></div>
+
+      <!-- Consumption per vehicle table -->
+      <div class="dash-section-label">Consumo Médio por Veículo (km/L)</div>
+      <div class="panel">
+        <div class="panel-body" style="padding:0">
+          <div id="consumption-table" class="consumption-table"></div>
+        </div>
+      </div>
+
+      <!-- Hidden legacy oil alert panel (kept for compat) -->
+      <div class="panel" id="oil-alert-panel" style="display:none">
+        <div id="oil-alert-list" class="activity-list"></div>
+      </div>
+    </section>
+
+    <!-- ===== VEÍCULOS ===== -->
+    <section class="page" id="vehicles-page">
+      <div class="page-header">
+        <div><h1 class="page-title">Veículos</h1><p class="page-desc">Cadastre e gerencie a frota</p></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title" id="v-form-title">Novo Veículo</span></div>
+        <div class="type-toggle">
+          <button class="type-btn active" data-type="car" onclick="selectVehicleType('car',this)">🚗 Carro</button>
+          <button class="type-btn" data-type="moto" onclick="selectVehicleType('moto',this)">🏍️ Moto</button>
+        </div>
+        <input type="hidden" id="v-type" value="car">
+        <form id="vehicle-form" class="form-grid" onsubmit="submitVehicle(event)">
+          <div class="field"><label>Placa *</label><input type="text" id="v-plate" required placeholder="ABC-1234" maxlength="8"></div>
+          <div class="field"><label>Marca *</label><input type="text" id="v-brand" required placeholder="Toyota"></div>
+          <div class="field"><label>Modelo *</label><input type="text" id="v-model" required placeholder="Hilux"></div>
+          <div class="field"><label>Ano *</label><input type="number" id="v-year" required placeholder="2023" min="1900" max="2030"></div>
+          <div class="field"><label>Cor</label><input type="text" id="v-color" placeholder="Prata"></div>
+          <div class="field"><label>Combustível</label>
+            <select id="v-fuel-type"><option value="">Selecione...</option><option>Gasolina</option><option>Etanol</option><option>Flex</option><option>Diesel</option><option>GNV</option><option>Elétrico</option></select>
+          </div>
+          <div class="field"><label>KM Atual *</label><input type="text" inputmode="numeric" id="v-km" required placeholder="0" oninput="maskKmInput(this)"></div>
+          <div class="field"><label>Última Manutenção</label><input type="date" id="v-last-maint"></div>
+          <div class="field"><label>Última Troca de Óleo</label><input type="date" id="v-last-oil"></div>
+          <div class="field"><label>KM na Última Troca</label><input type="text" inputmode="numeric" id="v-oil-km" placeholder="0" oninput="maskKmInput(this)"></div>
+          <div class="field"><label>Intervalo Óleo (km)</label><input type="number" id="v-oil-interval" placeholder="5000" value="5000" min="500"></div>
+          <div class="field fa">
+            <button type="submit" class="btn btn-primary" id="v-submit-btn">Cadastrar Veículo</button>
+            <button type="button" class="btn btn-ghost" onclick="resetVehicleForm()">Limpar</button>
+          </div>
+        </form>
+      </div>
+      <div id="vehicle-list"></div>
+    </section>
+
+    <!-- ===== MOTORISTAS ===== -->
+    <section class="page" id="drivers-page">
+      <div class="page-header">
+        <div><h1 class="page-title">Motoristas</h1><p class="page-desc">Colaboradores habilitados a conduzir</p></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title" id="d-form-title">Novo Motorista</span></div>
+        <form id="driver-form" class="form-grid" onsubmit="submitDriver(event)">
+          <div class="field"><label>Nome Completo *</label><input type="text" id="d-name" required placeholder="Nome do motorista" onblur="applyNameCasing(this)"></div>
+          <div class="field"><label>Função *</label><input type="text" id="d-function" required placeholder="Técnico, Entregador..."></div>
+          <div class="field"><label>CPF *</label><input type="text" id="d-cpf" required placeholder="000.000.000-00" maxlength="14" oninput="maskCPFInput(this)"></div>
+          <div class="field"><label>CNH *</label><input type="text" id="d-cnh" required placeholder="Número da CNH"></div>
+          <div class="field"><label>Categoria CNH</label>
+            <select id="d-cnh-cat"><option value="B">B</option><option value="A">A</option><option value="AB">AB</option><option value="C">C</option><option value="D">D</option><option value="E">E</option></select>
+          </div>
+          <div class="field"><label>Validade CNH</label><input type="date" id="d-cnh-expiry"></div>
+          <div class="field"><label>Telefone</label><input type="tel" id="d-phone" placeholder="(43) 99999-9999"></div>
+          <div class="field fw"><label>Endereço</label><input type="text" id="d-address" placeholder="Endereço completo"></div>
+          <div class="field fa">
+            <button type="submit" class="btn btn-primary" id="d-submit-btn">Cadastrar Motorista</button>
+            <button type="button" class="btn btn-ghost" onclick="resetDriverForm()">Limpar</button>
+          </div>
+        </form>
+      </div>
+      <div id="driver-list"></div>
+    </section>
+
+    <!-- ===== VIAGENS ===== -->
+    <section class="page" id="trips-page">
+      <div class="page-header">
+        <div><h1 class="page-title">Viagens</h1><p class="page-desc">Programação e prestação de contas de viagens técnicas</p></div>
+      </div>
+
+      <!-- LIST VIEW -->
+      <div id="trips-list-view">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Programar Viagem</span></div>
+          <form id="trip-form" class="form-grid" onsubmit="submitTrip(event)">
+            <div class="field"><label>Número da Viagem *</label><input type="text" id="t-number" required placeholder="Ex: V-2026-001"></div>
+            <div class="field"><label>Cliente Atendido *</label><input type="text" id="t-client" required placeholder="Nome do cliente" onblur="applyNameCasing(this)"></div>
+            <div class="field"><label>Número da OS</label><input type="text" id="t-os" placeholder="OS-0000"></div>
+            <div class="field"><label>Obra</label><input type="text" id="t-obra" placeholder="Nome / local da obra" onblur="applyNameCasing(this)"></div>
+            <div class="field"><label>Data de Saída *</label><input type="date" id="t-departure" required></div>
+            <div class="field"><label>Data Prevista de Retorno</label><input type="date" id="t-return"></div>
+            <div class="field"><label>Cidade Origem *</label><input type="text" id="t-origin-city" required></div>
+            <div class="field"><label>Estado Origem *</label><input type="text" id="t-origin-state" required maxlength="2" placeholder="PR" style="text-transform:uppercase"></div>
+            <div class="field"><label>Cidade Destino *</label><input type="text" id="t-dest-city" required></div>
+            <div class="field"><label>Estado Destino *</label><input type="text" id="t-dest-state" required maxlength="2" placeholder="SP" style="text-transform:uppercase"></div>
+            <div class="field"><label>Veículo *</label><select id="t-vehicle" required><option value="">Selecione...</option></select></div>
+            <div class="field"><label>Motorista *</label><select id="t-driver" required><option value="">Selecione...</option></select></div>
+            <div class="field fw"><label>Técnicos Participantes</label><input type="text" id="t-technicians" placeholder="Ex: João Silva, Maria Souza"></div>
+            <div class="field fw"><label>Observações</label><textarea id="t-notes" placeholder="Observações gerais da viagem"></textarea></div>
+            <div class="field fa">
+              <button type="submit" class="btn btn-primary" id="t-submit-btn">Programar Viagem</button>
+              <button type="button" class="btn btn-ghost" onclick="resetTripForm()">Limpar</button>
+            </div>
+          </form>
+        </div>
+        <div id="trip-list"></div>
+      </div>
+
+      <!-- DETAIL VIEW -->
+      <div id="trips-detail-view" style="display:none">
+        <button class="btn btn-ghost btn-sm" style="margin-bottom:12px" onclick="closeTripDetail()">← Voltar para Viagens</button>
+        <div id="trip-detail-header"></div>
+
+        <div class="tab-nav" id="trip-tab-nav">
+          <button class="tab-btn active" data-tab="checklist" onclick="switchTripTab('checklist', this)">✅ Checklist</button>
+          <button class="tab-btn" data-tab="equipment" onclick="switchTripTab('equipment', this)">📦 Equipamentos</button>
+          <button class="tab-btn" data-tab="expenses" onclick="switchTripTab('expenses', this)">💰 Prestação de Contas</button>
+          <button class="tab-btn" data-tab="approval" onclick="switchTripTab('approval', this)">✅ Aprovação Financeira</button>
+        </div>
+
+        <div class="tab-content active" id="trip-tab-content-checklist"></div>
+        <div class="tab-content" id="trip-tab-content-equipment"></div>
+        <div class="tab-content" id="trip-tab-content-expenses"></div>
+        <div class="tab-content" id="trip-tab-content-approval"></div>
+      </div>
+    </section>
+
+    <!-- ===== ATRIBUIÇÕES ===== -->
+    <section class="page" id="assignments-page">
+      <div class="page-header">
+        <div><h1 class="page-title">Atribuições</h1><p class="page-desc">Registro de uso e devolução de veículos</p></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Registrar Uso</span></div>
+        <form id="assignment-form" class="form-grid" onsubmit="submitAssignment(event)">
+          <div class="field"><label>Motorista *</label><select id="a-driver" required><option value="">Selecione...</option></select></div>
+          <div class="field"><label>Veículo *</label><select id="a-vehicle" required onchange="checkAndAlertOilStatus(this.value)"><option value="">Selecione...</option></select></div>
+          <div class="field"><label>Data de Retirada *</label><input type="date" id="a-date" required></div>
+          <div class="field"><label>KM na Retirada *</label><input type="text" inputmode="numeric" id="a-km-start" required placeholder="0" oninput="maskKmInput(this)" onblur="checkOilOnKmStartInput()"></div>
+          <div class="field"><label>Data de Devolução</label><input type="date" id="a-return-date"></div>
+          <div class="field"><label>KM na Devolução</label><input type="text" inputmode="numeric" id="a-km-end" placeholder="Preencher na devolução" oninput="maskKmInput(this)"></div>
+          <div class="field fw"><label>Destino / Observação</label><input type="text" id="a-obs" placeholder="Ex: Visita técnica — Sicoob Londrina"></div>
+          <div class="field fa">
+            <button type="submit" class="btn btn-primary" id="a-submit-btn">Registrar</button>
+            <button type="button" class="btn btn-ghost" onclick="resetAssignmentForm()">Limpar</button>
+          </div>
+        </form>
+      </div>
+      <div class="filter-bar">
+        <div class="filter-bar-head">
+          <div class="filter-bar-title">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M2.5 4h15L12 10.5V16l-4 2v-7.5L2.5 4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Filtros<span class="filter-bar-count" id="a-filter-count" hidden>0</span>
+          </div>
+          <button type="button" class="filter-bar-clear" id="a-filter-clear" onclick="clearToolbarFilters('a')" hidden>
+            <svg viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Limpar
+          </button>
+        </div>
+        <div class="filter-bar-row">
+          <div class="filter-search-box">
+            <input class="filter-input" type="text" placeholder="Buscar por placa, motorista..." id="a-search" oninput="renderAssignmentList(); toggleSearchClear(this)" />
+            <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="M18 18l-4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <button type="button" class="filter-input-clear" onclick="clearSearchField('a-search', renderAssignmentList)"><svg viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          </div>
+          <div class="filter-select-box">
+            <select class="filter-select" id="a-status-filter" onchange="renderAssignmentList()">
+              <option value="">Todos os status</option><option value="uso">Em Uso</option><option value="dev">Devolvido</option>
+            </select>
+            <svg viewBox="0 0 20 20" fill="none"><path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+      </div>
+      <div id="assignment-list"></div>
+    </section>
+
+    <!-- ===== ABASTECIMENTOS ===== -->
+    <section class="page" id="fuel-page">
+      <div class="page-header">
+        <div><h1 class="page-title">Abastecimentos</h1><p class="page-desc">Controle de combustível e consumo</p></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Registrar Abastecimento</span></div>
+        <form id="fuel-form" class="form-grid" onsubmit="submitFuel(event)">
+          <div class="field"><label>Veículo *</label><select id="f-vehicle" required onchange="calcConsumption()"><option value="">Selecione...</option></select></div>
+          <div class="field"><label>Motorista *</label><select id="f-driver" required><option value="">Selecione...</option></select></div>
+          <div class="field"><label>Data *</label><input type="date" id="f-date" required></div>
+          <div class="field"><label>Combustível</label>
+            <select id="f-fuel-type"><option>Gasolina</option><option>Etanol</option><option>Flex</option><option>Diesel</option><option>GNV</option></select>
+          </div>
+          <div class="field"><label>Litros *</label><input type="number" id="f-liters" step="0.01" required placeholder="0.00" oninput="calcConsumption()"></div>
+          <div class="field"><label>Custo Total (R$) *</label><input type="text" inputmode="decimal" id="f-cost" required placeholder="0,00" oninput="maskCurrencyInput(this); calcPricePerLiter()"></div>
+          <div class="field"><label>Preço/Litro</label><input type="text" id="f-price-per-liter" readonly class="input-ro" placeholder="—"></div>
+          <div class="field"><label>KM Atual *</label><input type="text" inputmode="numeric" id="f-km" required placeholder="0" oninput="maskKmInput(this);calcConsumption()"></div>
+          <div class="field"><label>Consumo Calculado</label><input type="text" id="f-consumption" readonly class="input-ro" placeholder="—"></div>
+          <div class="field"><label>Posto</label><input type="text" id="f-station" placeholder="Nome do posto" onblur="applyNameCasing(this)"></div>
+          <div class="field fa">
+            <button type="submit" class="btn btn-primary" id="f-submit-btn">Registrar</button>
+            <button type="button" class="btn btn-ghost" onclick="resetFuelForm()">Limpar</button>
+          </div>
+        </form>
+        <div class="consumption-box" id="consumption-box" style="display:none"><div id="consumption-detail"></div></div>
+      </div>
+      <div class="filter-bar">
+        <div class="filter-bar-head">
+          <div class="filter-bar-title">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M2.5 4h15L12 10.5V16l-4 2v-7.5L2.5 4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Filtros<span class="filter-bar-count" id="f-filter-count" hidden>0</span>
+          </div>
+          <button type="button" class="filter-bar-clear" id="f-filter-clear" onclick="clearToolbarFilters('f')" hidden>
+            <svg viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Limpar
+          </button>
+        </div>
+        <div class="filter-bar-row">
+          <div class="filter-search-box">
+            <input class="filter-input" type="text" placeholder="Buscar por placa, motorista..." id="f-search" oninput="renderFuelList(); toggleSearchClear(this)" />
+            <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="M18 18l-4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <button type="button" class="filter-input-clear" onclick="clearSearchField('f-search', renderFuelList)"><svg viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          </div>
+          <div class="filter-select-box">
+            <select class="filter-select" id="f-type-filter" onchange="renderFuelList()">
+              <option value="">Todos os combustíveis</option><option>Gasolina</option><option>Etanol</option><option>Diesel</option><option>GNV</option>
+            </select>
+            <svg viewBox="0 0 20 20" fill="none"><path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="filter-date-box">
+            <svg viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M2 8h16" stroke="currentColor" stroke-width="1.4"/><path d="M6 2v3M14 2v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <input class="filter-date" type="date" id="f-date-from" onchange="renderFuelList()" title="De" />
+            <span class="filter-date-sep">→</span>
+            <input class="filter-date" type="date" id="f-date-to" onchange="renderFuelList()" title="Até" />
+          </div>
+        </div>
+      </div>
+      <div id="fuel-list"></div>
+    </section>
+
+    <!-- ===== MANUTENÇÕES ===== -->
+    <section class="page" id="maintenance-page">
+      <div class="page-header">
+        <div><h1 class="page-title">Manutenções</h1><p class="page-desc">Serviços realizados na frota</p></div>
+      </div>
+
+      <div class="tab-nav" id="maint-tab-nav">
+        <button class="tab-btn active" data-tab="register" onclick="switchMaintTab('register', this)">🔧 Registrar</button>
+        <button class="tab-btn" data-tab="scheduled" onclick="switchMaintTab('scheduled', this)">🗓️ Programadas <span class="tab-count" id="maint-tab-count-scheduled"></span></button>
+        <button class="tab-btn" data-tab="history" onclick="switchMaintTab('history', this)">📋 Histórico</button>
+      </div>
+
+      <!-- ── ABA: REGISTRAR MANUTENÇÃO REALIZADA ── -->
+      <div class="tab-content active" id="maint-tab-content-register">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Registrar Manutenção Realizada</span></div>
+          <form id="maintenance-form" class="form-grid" onsubmit="submitMaintenance(event)">
+            <div class="field"><label>Veículo *</label><select id="m-vehicle" required><option value="">Selecione...</option></select></div>
+            <div class="field"><label>Responsável *</label><select id="m-driver" required><option value="">Selecione...</option></select></div>
+            <div class="field"><label>Data *</label><input type="date" id="m-date" required></div>
+            <div class="field"><label>KM *</label><input type="text" inputmode="numeric" id="m-km" required placeholder="0" oninput="maskKmInput(this)"></div>
+            <div class="field"><label>Custo (R$) *</label><input type="text" inputmode="decimal" id="m-cost" required placeholder="0,00" oninput="maskCurrencyInput(this)"></div>
+            <div class="field"><label>Tipo</label>
+              <select id="m-type"><option>Preventiva</option><option>Corretiva</option><option>Revisão</option><option>Pneus</option><option>Freios</option><option>Suspensão</option><option>Elétrica</option><option>Funilaria</option><option>Outro</option></select>
+            </div>
+            <div class="field"><label>Oficina / Fornecedor</label><input type="text" id="m-workshop" placeholder="Nome da oficina" onblur="applyNameCasing(this)"></div>
+            <div class="field"><label>Próxima Revisão (KM)</label><input type="text" inputmode="numeric" id="m-next-km" placeholder="Ex: 60000" oninput="maskKmInput(this)"></div>
+            <div class="field fw"><label>Descrição *</label><textarea id="m-desc" required placeholder="Descreva o serviço realizado..."></textarea></div>
+            <div class="field fa">
+              <button type="submit" class="btn btn-primary" id="m-submit-btn">Registrar</button>
+              <button type="button" class="btn btn-ghost" onclick="resetMaintenanceForm()">Limpar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ── ABA: PROGRAMAR / MANUTENÇÕES PROGRAMADAS ── -->
+      <div class="tab-content" id="maint-tab-content-scheduled">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">🗓️ Programar Manutenção</span></div>
+          <p class="page-desc" style="padding:0 20px;margin:10px 0 6px;">Agende uma manutenção futura por data e/ou KM previsto, antes de ela ser realizada.</p>
+          <form id="schedule-maintenance-form" class="form-grid" onsubmit="submitScheduledMaintenance(event)">
+            <div class="field"><label>Veículo *</label><select id="sm-vehicle" required><option value="">Selecione...</option></select></div>
+            <div class="field"><label>Tipo</label>
+              <select id="sm-type"><option>Preventiva</option><option>Corretiva</option><option>Revisão</option><option>Pneus</option><option>Freios</option><option>Suspensão</option><option>Elétrica</option><option>Funilaria</option><option>Outro</option></select>
+            </div>
+            <div class="field"><label>Prioridade</label>
+              <select id="sm-priority"><option value="baixa">Baixa</option><option value="media" selected>Média</option><option value="alta">Alta</option></select>
+            </div>
+            <div class="field"><label>Data Prevista</label><input type="date" id="sm-due-date"></div>
+            <div class="field"><label>KM Previsto</label><input type="text" inputmode="numeric" id="sm-due-km" placeholder="Ex: 60000" oninput="maskKmInput(this)"></div>
+            <div class="field fw"><label>Serviço / Descrição *</label><textarea id="sm-desc" required placeholder="Ex: Troca de correia dentada, revisão de freios..."></textarea></div>
+            <div class="field fw"><label>Observações</label><textarea id="sm-notes" placeholder="Peças a comprar, oficina indicada, etc..."></textarea></div>
+            <div class="field fa">
+              <button type="submit" class="btn btn-primary" id="sm-submit-btn">Programar Manutenção</button>
+              <button type="button" class="btn btn-ghost" onclick="resetScheduleMaintenanceForm()">Limpar</button>
+            </div>
+          </form>
+        </div>
+        <div class="panel-header" style="background:transparent;border:none;padding:6px 2px"><span class="panel-title">Manutenções Programadas</span></div>
+        <div id="scheduled-maintenance-list"></div>
+      </div>
+
+      <!-- ── ABA: HISTÓRICO DE MANUTENÇÕES REALIZADAS ── -->
+      <div class="tab-content" id="maint-tab-content-history">
+        <div class="filter-bar">
+          <div class="filter-bar-head">
+            <div class="filter-bar-title">
+              <svg viewBox="0 0 20 20" fill="none"><path d="M2.5 4h15L12 10.5V16l-4 2v-7.5L2.5 4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+              Filtros<span class="filter-bar-count" id="m-filter-count" hidden>0</span>
+            </div>
+            <button type="button" class="filter-bar-clear" id="m-filter-clear" onclick="clearToolbarFilters('m')" hidden>
+              <svg viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Limpar
+            </button>
+          </div>
+          <div class="filter-bar-row">
+            <div class="filter-search-box">
+              <input class="filter-input" type="text" placeholder="Buscar por placa, descrição..." id="m-search" oninput="renderMaintenanceList(); toggleSearchClear(this)" />
+              <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="M18 18l-4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              <button type="button" class="filter-input-clear" onclick="clearSearchField('m-search', renderMaintenanceList)"><svg viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+            </div>
+            <div class="filter-select-box">
+              <select class="filter-select" id="m-type-filter" onchange="renderMaintenanceList()">
+                <option value="">Todos os tipos</option><option>Preventiva</option><option>Corretiva</option><option>Revisão</option><option>Pneus</option><option>Freios</option><option>Suspensão</option><option>Elétrica</option><option>Funilaria</option><option>Outro</option>
+              </select>
+              <svg viewBox="0 0 20 20" fill="none"><path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="filter-date-box">
+              <svg viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M2 8h16" stroke="currentColor" stroke-width="1.4"/><path d="M6 2v3M14 2v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              <input class="filter-date" type="date" id="m-date-from" onchange="renderMaintenanceList()" title="De" />
+              <span class="filter-date-sep">→</span>
+              <input class="filter-date" type="date" id="m-date-to" onchange="renderMaintenanceList()" title="Até" />
+            </div>
+          </div>
+        </div>
+        <div id="maintenance-list"></div>
+      </div>
+    </section>
+
+    <!-- ===== TROCA DE ÓLEO ===== -->
+    <section class="page" id="oil-page">
+      <div class="page-header">
+        <div><h1 class="page-title">Troca de Óleo</h1><p class="page-desc">Controle de intervalos e histórico completo</p></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Registrar Troca</span></div>
+        <form id="oil-form" class="form-grid" onsubmit="submitOil(event)">
+          <div class="field"><label>Veículo *</label><select id="o-vehicle" required onchange="updateNextOilKm()"><option value="">Selecione...</option></select></div>
+          <div class="field"><label>Responsável *</label><select id="o-driver" required><option value="">Selecione...</option></select></div>
+          <div class="field"><label>Data *</label><input type="date" id="o-date" required onchange="updateNextOilKm()"></div>
+          <div class="field"><label>KM Atual *</label><input type="text" inputmode="numeric" id="o-km" required placeholder="0" oninput="maskKmInput(this);updateNextOilKm()"></div>
+          <div class="field"><label>Custo (R$) *</label><input type="text" inputmode="decimal" id="o-cost" required placeholder="0,00" oninput="maskCurrencyInput(this)"></div>
+          <div class="field"><label>Tipo de Óleo</label>
+            <select id="o-oil-type"><option>Mineral</option><option>Semissintético</option><option selected>Sintético</option></select>
+          </div>
+          <div class="field"><label>Viscosidade</label><input type="text" id="o-viscosity" placeholder="Ex: 5W30, 10W40"></div>
+          <div class="field"><label>Intervalo (km)</label><input type="number" id="o-interval" value="5000" min="500" oninput="updateNextOilKm()"></div>
+          <div class="field"><label>Próxima Troca (km)</label><input type="text" id="o-next-km" readonly class="input-ro" placeholder="—"></div>
+          <div class="field"><label>Intervalo (meses)</label><input type="number" id="o-interval-months" value="6" min="1" oninput="updateNextOilKm()"></div>
+          <div class="field"><label>Próxima Troca (data)</label><input type="text" id="o-next-date" readonly class="input-ro" placeholder="—"></div>
+          <div class="field"><label>Marca do Óleo</label><input type="text" id="o-brand" placeholder="Castrol, Mobil, Shell..."></div>
+          <div class="field fw"><label>Observações</label><textarea id="o-obs" placeholder="Filtros trocados, peças, etc..."></textarea></div>
+          <div class="field fa">
+            <button type="submit" class="btn btn-primary" id="o-submit-btn">Registrar Troca</button>
+            <button type="button" class="btn btn-ghost" onclick="resetOilForm()">Limpar</button>
+          </div>
+        </form>
+      </div>
+      <div class="filter-bar">
+        <div class="filter-bar-head">
+          <div class="filter-bar-title">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M2.5 4h15L12 10.5V16l-4 2v-7.5L2.5 4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Filtros<span class="filter-bar-count" id="o-filter-count" hidden>0</span>
+          </div>
+          <button type="button" class="filter-bar-clear" id="o-filter-clear" onclick="clearToolbarFilters('o')" hidden>
+            <svg viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Limpar
+          </button>
+        </div>
+        <div class="filter-bar-row">
+          <div class="filter-search-box">
+            <input class="filter-input" type="text" placeholder="Buscar por placa, responsável..." id="o-search" oninput="renderOilList(); toggleSearchClear(this)" />
+            <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="M18 18l-4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <button type="button" class="filter-input-clear" onclick="clearSearchField('o-search', renderOilList)"><svg viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          </div>
+          <div class="filter-date-box">
+            <svg viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M2 8h16" stroke="currentColor" stroke-width="1.4"/><path d="M6 2v3M14 2v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <input class="filter-date" type="date" id="o-date-from" onchange="renderOilList()" title="De" />
+            <span class="filter-date-sep">→</span>
+            <input class="filter-date" type="date" id="o-date-to" onchange="renderOilList()" title="Até" />
+          </div>
+        </div>
+      </div>
+      <div id="oil-list"></div>
+    </section>
+
+    <!-- ===== RELATÓRIOS ===== -->
+    <section class="page" id="reports-page">
+      <div class="page-header">
+        <div><h1 class="page-title">Relatórios</h1><p class="page-desc">Relatório detalhado por veículo e período</p></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Filtros</span></div>
+        <div class="form-grid">
+          <div class="field"><label>Veículo</label><select id="r-vehicle" onchange="buildReport()"><option value="">Todos os veículos</option></select></div>
+          <div class="field"><label>Período Rápido</label>
+            <select id="r-period-quick" onchange="applyQuickPeriod()">
+              <option value="">Selecione...</option>
+              <option value="today">Hoje</option>
+              <option value="week">Esta Semana</option>
+              <option value="month">Este Mês</option>
+              <option value="lastmonth">Mês Anterior</option>
+              <option value="quarter">Trimestre</option>
+              <option value="year">Este Ano</option>
+              <option value="custom">Personalizado</option>
+            </select>
+          </div>
+          <div class="field"><label>De</label><input type="date" id="r-date-from" onchange="buildReport()"></div>
+          <div class="field"><label>Até</label><input type="date" id="r-date-to" onchange="buildReport()"></div>
+          <div class="field"><label>Motorista</label><select id="r-driver" onchange="buildReport()"><option value="">Todos</option></select></div>
+          <div class="field fa" style="gap:8px">
+            <button type="button" class="btn btn-primary" onclick="printReport()" id="r-print-btn" disabled>🖨 Imprimir</button>
+            <button type="button" class="btn btn-ghost" onclick="exportReportPDF()" id="r-pdf-btn" disabled>📄 Exportar PDF</button>
+            <button type="button" class="btn btn-ghost" onclick="exportReportCSV()" id="r-csv-btn" disabled>📊 CSV / Excel</button>
+          </div>
+        </div>
+      </div>
+      <div id="report-output" style="display:none">
+        <div class="report-sheet" id="report-sheet"></div>
+      </div>
+    </section>
+
+    <!-- ===== MALETAS ===== -->
+    <section class="page" id="briefcases-page">
+      <div class="page-header">
+        <div><h1 class="page-title">Maletas</h1><p class="page-desc">Cadastre maletas de técnicos e suas ferramentas — o PDF de conferência é gerado automaticamente no cadastro</p></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title" id="bc-form-title">Nova Maleta</span></div>
+        <form id="briefcase-form" class="form-grid" onsubmit="submitBriefcase(event)">
+          <div class="field"><label>Nome da Maleta *</label><input type="text" id="bc-name" required placeholder="Ex: Maleta Elétrica, Kit Redes..."></div>
+          <div class="field"><label>Código / Identificador</label><input type="text" id="bc-code" placeholder="Ex: MAL-01, TEC-A"></div>
+          <div class="field"><label>Responsável (Técnico)</label><select id="bc-assigned-driver"><option value="">Nenhum (maleta compartilhada)</option></select></div>
+          <div class="field fw">
+            <label>Ferramentas</label>
+            <div class="bc-tool-row">
+              <input type="text" id="bc-tool-input" placeholder="Nome da ferramenta (pressione Enter ou clique em +)" onkeydown="if(event.key==='Enter'){event.preventDefault();addBriefcaseTool();}">
+              <button type="button" class="btn btn-primary btn-sm" onclick="addBriefcaseTool()">+ Adicionar</button>
+            </div>
+            <div id="bc-tools-list" class="bc-tools-list"></div>
+          </div>
+          <div class="field fw"><label>Observações</label><textarea id="bc-obs" placeholder="Informações adicionais sobre a maleta..."></textarea></div>
+          <div class="field fa">
+            <button type="submit" class="btn btn-primary" id="bc-submit-btn">Cadastrar Maleta</button>
+            <button type="button" class="btn btn-ghost" onclick="resetBriefcaseForm()">Limpar</button>
+          </div>
+        </form>
+      </div>
+      <div id="briefcase-list"></div>
+    </section>
+
+    <!-- ===== TERMO SEMANAL DA MALETA ===== -->
+    <section class="page" id="weekly-terms-page">
+      <div class="page-header">
+        <div><h1 class="page-title">Termo da Maleta</h1><p class="page-desc">Assinatura eletrônica de responsabilidade — válida por 6 meses, ou renovada quando o administrador solicitar. O gestor pode conferir fisicamente a maleta de qualquer técnico a qualquer momento, sem precisar esperar os 6 meses. A assinatura do termo só fica liberada depois que a maleta for conferida — exceto na primeira vez que ela é vinculada ao técnico, quando a conferência já foi feita no cadastro.</p></div>
+        <button class="btn btn-ghost btn-sm" id="btn-request-all-terms" onclick="requestAllBriefcaseSignatures()">🔔 Solicitar Renovação para Todos</button>
+      </div>
+      <div class="tab-nav" id="weekly-terms-tab-nav">
+        <button class="tab-btn active" data-tab="status" onclick="switchWeeklyTermsTab('status', this)">📋 Status dos Técnicos</button>
+        <button class="tab-btn" data-tab="conferences" onclick="switchWeeklyTermsTab('conferences', this)">🔍 Histórico de Conferências</button>
+        <button class="tab-btn" data-tab="terms" onclick="switchWeeklyTermsTab('terms', this)">✍️ Histórico de Termos Assinados</button>
+      </div>
+
+      <div class="tab-content active" id="weekly-terms-tab-content-status">
+        <div id="weekly-terms-list"></div>
+      </div>
+      <div class="tab-content" id="weekly-terms-tab-content-conferences">
+        <div id="briefcase-conference-history"></div>
+      </div>
+      <div class="tab-content" id="weekly-terms-tab-content-terms">
+        <div id="weekly-terms-history"></div>
+      </div>
+    </section>
+
+    <!-- ===== FERRAMENTAS DE USO COMUM ===== -->
+    <section class="page" id="temp-items-page">
+      <div class="page-header">
+        <div><h1 class="page-title">Ferramentas de Uso Comum</h1><p class="page-desc">Cadastro das ferramentas públicas da empresa, controle de quem pegou/devolveu e relatório completo</p></div>
+      </div>
+
+      <div class="tab-nav" id="tools-tab-nav">
+        <button class="tab-btn active" data-tab="catalog" onclick="switchToolsTab('catalog', this)">🧰 Ferramentas Cadastradas</button>
+        <button class="tab-btn" data-tab="checkout" onclick="switchToolsTab('checkout', this)">🔄 Retiradas & Devoluções</button>
+        <button class="tab-btn" data-tab="report" onclick="switchToolsTab('report', this)">📋 Relatório</button>
+      </div>
+
+      <!-- ── ABA: CADASTRO DE FERRAMENTAS ── -->
+      <div class="tab-content active" id="tools-tab-content-catalog">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title" id="tool-form-title">Nova Ferramenta</span></div>
+          <form id="tool-form" class="form-grid" onsubmit="submitTool(event)">
+            <div class="field fw"><label>Nome da Ferramenta *</label><input type="text" id="tool-name" required placeholder="Ex: Furadeira, Multímetro, Escada..."></div>
+            <div class="field"><label>Quantidade *</label><input type="number" id="tool-quantity" min="1" step="1" value="1" required></div>
+            <div class="field"><label>Preço (R$)</label><input type="text" inputmode="decimal" id="tool-price" placeholder="0,00" oninput="maskCurrencyInput(this)"></div>
+            <div class="field"><label>Categoria</label><input type="text" id="tool-category" placeholder="Ex: Elétrica, Mecânica..."></div>
+            <div class="field fw"><label>Observações</label><input type="text" id="tool-notes" placeholder="Opcional"></div>
+            <div class="field fa">
+              <button type="submit" class="btn btn-primary" id="tool-submit-btn">Cadastrar Ferramenta</button>
+              <button type="button" class="btn btn-ghost" onclick="resetToolForm()">Limpar</button>
+            </div>
+          </form>
+        </div>
+        <div id="tool-list" style="margin-top:14px"></div>
+      </div>
+
+      <!-- ── ABA: RETIRADAS & DEVOLUÇÕES ── -->
+      <div class="tab-content" id="tools-tab-content-checkout">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Registrar Retirada</span></div>
+          <form id="temp-item-form" class="form-grid" onsubmit="submitTempItem(event)">
+            <div class="field"><label>Técnico *</label><select id="ti-driver" required><option value="">Selecione...</option></select></div>
+            <div class="field fw"><label>Ferramenta *</label><select id="ti-tool" required><option value="">Selecione...</option></select></div>
+            <div class="field"><label>Data de Retirada *</label><input type="date" id="ti-checkout-date" required></div>
+            <div class="field"><label>Data de Devolução</label><input type="date" id="ti-return-date"></div>
+            <div class="field fw"><label>Observações</label><input type="text" id="ti-notes" placeholder="Opcional"></div>
+            <div class="field fa">
+              <button type="submit" class="btn btn-primary" id="ti-submit-btn">Registrar Retirada</button>
+              <button type="button" class="btn btn-ghost" onclick="resetTempItemForm()">Limpar</button>
+            </div>
+          </form>
+        </div>
+        <div id="temp-item-list" style="margin-top:14px"></div>
+      </div>
+
+      <!-- ── ABA: RELATÓRIO ── -->
+      <div class="tab-content" id="tools-tab-content-report">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Filtros</span></div>
+          <div class="form-grid">
+            <div class="field"><label>Ferramenta</label><select id="tr-tool" onchange="renderToolsReport()"><option value="">Todas</option></select></div>
+            <div class="field"><label>Técnico</label><select id="tr-driver" onchange="renderToolsReport()"><option value="">Todos</option></select></div>
+            <div class="field"><label>Status</label>
+              <select id="tr-status" onchange="renderToolsReport()">
+                <option value="">Todos</option>
+                <option value="em_posse">Em Posse</option>
+                <option value="devolvido">Devolvido</option>
+              </select>
+            </div>
+            <div class="field"><label>De</label><input type="date" id="tr-date-from" onchange="renderToolsReport()"></div>
+            <div class="field"><label>Até</label><input type="date" id="tr-date-to" onchange="renderToolsReport()"></div>
+            <div class="field fa" style="gap:8px">
+              <button type="button" class="btn btn-primary" onclick="printToolsReport()">🖨 Imprimir</button>
+              <button type="button" class="btn btn-ghost" onclick="exportToolsReportCSV()">📊 CSV / Excel</button>
+            </div>
+          </div>
+        </div>
+        <div id="tools-report-summary"></div>
+        <div id="tools-report-output"></div>
+      </div>
+    </section>
+
+    <!-- ===== DEVOLUÇÃO DE MALETA ===== -->
+    <section class="page" id="briefcase-return-page">
+      <div class="page-header">
+        <div><h1 class="page-title">Devolução de Maleta</h1><p class="page-desc">Use somente quando um técnico pedir demissão ou for desligado — a maleta é conferida e liberada para outro técnico. Para conferências periódicas sem desligamento, use a aba "Termo da Maleta"</p></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title" id="br-form-title">Nova Devolução Final (Desligamento)</span></div>
+        <form id="briefcase-return-form" class="form-grid" onsubmit="submitBriefcaseReturn(event)">
+          <div class="field"><label>Maleta *</label><select id="br-briefcase" required onchange="loadBriefcaseChecklist()"><option value="">Selecione...</option></select></div>
+          <div class="field"><label>Técnico Responsável *</label><select id="br-driver" required><option value="">Selecione...</option></select></div>
+          <div class="field"><label>Data de Devolução *</label><input type="date" id="br-date" required></div>
+          <div class="field fw">
+            <label>Conferência de Ferramentas</label>
+            <div id="br-checklist" style="background:var(--bg-surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;min-height:60px;">
+              <span style="color:var(--text-muted);font-size:0.82rem;">Selecione uma maleta para ver o checklist de ferramentas</span>
+            </div>
+          </div>
+          <div class="field fw"><label>Itens em Falta / Observações</label><textarea id="br-missing" placeholder="Liste os itens que não foram devolvidos ou qualquer observação..."></textarea></div>
+          <div class="field fa">
+            <button type="submit" class="btn btn-primary" id="br-submit-btn">Registrar Devolução</button>
+            <button type="button" class="btn btn-ghost" onclick="resetBriefcaseReturnForm()">Limpar</button>
+          </div>
+        </form>
+      </div>
+      <div class="filter-bar">
+        <div class="filter-bar-head">
+          <div class="filter-bar-title">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M2.5 4h15L12 10.5V16l-4 2v-7.5L2.5 4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Filtros<span class="filter-bar-count" id="br-filter-count" hidden>0</span>
+          </div>
+          <button type="button" class="filter-bar-clear" id="br-filter-clear" onclick="clearToolbarFilters('br')" hidden>
+            <svg viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Limpar
+          </button>
+        </div>
+        <div class="filter-bar-row">
+          <div class="filter-search-box">
+            <input class="filter-input" type="text" placeholder="Buscar por maleta, técnico..." id="br-search" oninput="renderBriefcaseReturnList(); toggleSearchClear(this)" />
+            <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="M18 18l-4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <button type="button" class="filter-input-clear" onclick="clearSearchField('br-search', renderBriefcaseReturnList)"><svg viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          </div>
+          <div class="filter-date-box">
+            <svg viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M2 8h16" stroke="currentColor" stroke-width="1.4"/><path d="M6 2v3M14 2v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <input class="filter-date" type="date" id="br-date-from" onchange="renderBriefcaseReturnList()" title="De" />
+            <span class="filter-date-sep">→</span>
+            <input class="filter-date" type="date" id="br-date-to" onchange="renderBriefcaseReturnList()" title="Até" />
+          </div>
+        </div>
+      </div>
+      <div id="briefcase-return-list"></div>
+    </section>
+
+    <!-- ===== VISTORIA DO VEÍCULO ===== -->
+    <section class="page" id="inspection-page">
+      <div class="page-header">
+        <div><h1 class="page-title">Vistoria do Veículo</h1><p class="page-desc">Checklist de retirada e devolução — evita disputas sobre danos</p></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title" id="ins-form-title">Nova Vistoria</span></div>
+        <form id="inspection-form" class="form-grid" onsubmit="submitInspection(event)">
+          <div class="field"><label>Veículo *</label><select id="ins-vehicle" required><option value="">Selecione...</option></select></div>
+          <div class="field"><label>Responsável *</label><select id="ins-driver" required><option value="">Selecione...</option></select></div>
+          <div class="field"><label>Tipo *</label>
+            <select id="ins-type" required>
+              <option value="retirada">Retirada</option>
+              <option value="devolucao">Devolução</option>
+            </select>
+          </div>
+          <div class="field"><label>Data / Hora *</label><input type="datetime-local" id="ins-datetime" required></div>
+          <div class="field"><label>KM Atual *</label><input type="text" inputmode="numeric" id="ins-km" required placeholder="0" oninput="maskKmInput(this)"></div>
+          <div class="field"><label>Nível de Combustível</label>
+            <select id="ins-fuel-level">
+              <option value="cheio">Cheio</option>
+              <option value="3/4">3/4</option>
+              <option value="1/2" selected>1/2</option>
+              <option value="1/4">1/4</option>
+              <option value="reserva">Reserva</option>
+            </select>
+          </div>
+          <div class="field fw">
+            <label>Itens Vistoriados</label>
+            <div id="ins-checklist" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;padding:12px;background:var(--bg-surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);">
+              <label class="ins-check-item"><input type="checkbox" id="ins-pneus" checked> 🛞 Pneus OK</label>
+              <label class="ins-check-item"><input type="checkbox" id="ins-lataria" checked> 🚗 Lataria sem danos</label>
+              <label class="ins-check-item"><input type="checkbox" id="ins-limpeza" checked> 🧹 Limpeza interna</label>
+              <label class="ins-check-item"><input type="checkbox" id="ins-vidros" checked> 🔲 Vidros intactos</label>
+              <label class="ins-check-item"><input type="checkbox" id="ins-farois" checked> 💡 Faróis funcionando</label>
+              <label class="ins-check-item"><input type="checkbox" id="ins-retrovisor" checked> 🔄 Retrovisores OK</label>
+              <label class="ins-check-item"><input type="checkbox" id="ins-macaco" checked> 🔧 Macaco / triângulo</label>
+              <label class="ins-check-item"><input type="checkbox" id="ins-extintor" checked> 🧯 Extintor válido</label>
+            </div>
+          </div>
+          <div class="field fw"><label>Observações / Danos Observados</label><textarea id="ins-obs" placeholder="Descreva qualquer irregularidade, arranhado, dano ou pendência..."></textarea></div>
+          <div class="field fa">
+            <button type="submit" class="btn btn-primary" id="ins-submit-btn">Registrar Vistoria</button>
+            <button type="button" class="btn btn-ghost" onclick="resetInspectionForm()">Limpar</button>
+          </div>
+        </form>
+      </div>
+      <div class="filter-row">
+        <input class="filter-input" type="text" placeholder="🔍 Buscar por placa, responsável..." id="ins-search" oninput="renderInspectionList()" />
+        <select class="filter-select" id="ins-type-filter" onchange="renderInspectionList()">
+          <option value="">Todos os tipos</option>
+          <option value="retirada">Retirada</option>
+          <option value="devolucao">Devolução</option>
+        </select>
+        <input class="filter-date" type="date" id="ins-date-from" onchange="renderInspectionList()" title="De" />
+        <input class="filter-date" type="date" id="ins-date-to" onchange="renderInspectionList()" title="Até" />
+      </div>
+      <div id="inspection-list"></div>
+    </section>
+
+    <!-- ===== AGENDA / RESERVAS ===== -->
+    <section class="page" id="schedule-page">
+      <div class="page-header">
+        <div><h1 class="page-title">Agenda de Reservas</h1><p class="page-desc">Agende o uso de veículos com antecedência e evite conflitos de alocação</p></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title" id="sch-form-title">Nova Reserva</span></div>
+        <form id="schedule-form" class="form-grid" onsubmit="submitSchedule(event)">
+          <div class="field"><label>Veículo *</label><select id="sch-vehicle" required><option value="">Selecione...</option></select></div>
+          <div class="field" id="sch-driver-field"><label>Motorista *</label><select id="sch-driver" required><option value="">Selecione...</option></select></div>
+          <div class="field fw" id="sch-loan-toggle-field">
+            <label class="checkbox-label" style="display:flex;align-items:center;gap:8px;">
+              <input type="checkbox" id="sch-is-loan" style="width:16px;height:16px;accent-color:var(--orange);" onchange="toggleScheduleLoanFields()">
+              🔑 Emprestando o carro para alguém não cadastrado?
+            </label>
+          </div>
+          <div class="field" id="sch-loan-name-field" style="display:none"><label>Nome Completo *</label><input type="text" id="sch-loan-name" placeholder="Nome de quem vai usar o veículo" onblur="applyNameCasing(this)"></div>
+          <div class="field" id="sch-loan-cpf-field" style="display:none"><label>CPF *</label><input type="text" id="sch-loan-cpf" placeholder="000.000.000-00" maxlength="14" oninput="maskCPFInput(this)"></div>
+          <div class="field"><label>Data de Início *</label><input type="date" id="sch-date-start" required onchange="checkScheduleConflict()"></div>
+          <div class="field"><label>Data de Término *</label><input type="date" id="sch-date-end" required onchange="checkScheduleConflict()"></div>
+          <div class="field fw"><label>Destino / Motivo *</label><input type="text" id="sch-obs" required placeholder="Ex: Visita técnica em Londrina, Manutenção em campo..."></div>
+          <div class="field fw" id="sch-conflict-box" style="display:none">
+            <div class="alert-strip danger" id="sch-conflict-msg">⚠️ Conflito detectado!</div>
+          </div>
+          <div class="field fa">
+            <button type="submit" class="btn btn-primary" id="sch-submit-btn">Reservar Veículo</button>
+            <button type="button" class="btn btn-ghost" onclick="resetScheduleForm()">Limpar</button>
+          </div>
+        </form>
+      </div>
+      <div class="filter-bar">
+        <div class="filter-bar-head">
+          <div class="filter-bar-title">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M2.5 4h15L12 10.5V16l-4 2v-7.5L2.5 4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Filtros<span class="filter-bar-count" id="sch-filter-count" hidden>0</span>
+          </div>
+          <button type="button" class="filter-bar-clear" id="sch-filter-clear" onclick="clearToolbarFilters('sch')" hidden>
+            <svg viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Limpar
+          </button>
+        </div>
+        <div class="filter-bar-row">
+          <div class="filter-search-box">
+            <input class="filter-input" type="text" placeholder="Buscar por placa, motorista, destino..." id="sch-search" oninput="renderScheduleList(); toggleSearchClear(this)" />
+            <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="M18 18l-4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <button type="button" class="filter-input-clear" onclick="clearSearchField('sch-search', renderScheduleList)"><svg viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          </div>
+          <div class="filter-select-box">
+            <select class="filter-select" id="sch-status-filter" onchange="renderScheduleList()">
+              <option value="">Todos os status</option>
+              <option value="pendente">Pendentes</option>
+              <option value="concluida">Concluídas</option>
+              <option value="cancelada">Canceladas</option>
+            </select>
+            <svg viewBox="0 0 20 20" fill="none"><path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+      </div>
+      <div id="schedule-list"></div>
+    </section>
+
+
+    <!-- ===== MULTAS ===== -->
+    <section class="page" id="fines-page">
+      <div class="page-header">
+        <div><h1 class="page-title">Multas</h1><p class="page-desc">Controle de infrações e pontuação por veículo e motorista</p></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Nova Multa</span></div>
+        <form id="fine-form" class="form-grid" onsubmit="submitFine(event)">
+          <div class="field"><label>Veículo *</label><select id="fn-vehicle" required><option value="">Selecione...</option></select></div>
+          <div class="field"><label>Motorista</label><select id="fn-driver"><option value="">Não identificado</option></select></div>
+          <div class="field"><label>Data *</label><input type="date" id="fn-date" required></div>
+          <div class="field"><label>Tipo de Infração *</label><input type="text" id="fn-type" required placeholder="Ex: Excesso de velocidade"></div>
+          <div class="field"><label>Valor (R$) *</label><input type="text" inputmode="decimal" id="fn-amount" required placeholder="0,00" oninput="maskCurrencyInput(this)"></div>
+          <div class="field"><label>Pontuação (CNH)</label><input type="number" id="fn-points" min="0" max="20" placeholder="Ex: 5"></div>
+          <div class="field"><label>Status do Pagamento</label>
+            <select id="fn-payment-status">
+              <option value="pendente">Pendente</option>
+              <option value="pago">Pago</option>
+              <option value="recorrida">Em Recurso</option>
+            </select>
+          </div>
+          <div class="field fw"><label>Observações</label><input type="text" id="fn-notes" placeholder="Opcional"></div>
+          <div class="field fa">
+            <button type="submit" class="btn btn-primary" id="fn-submit-btn">Cadastrar Multa</button>
+            <button type="button" class="btn btn-ghost" onclick="resetFineForm()">Limpar</button>
+          </div>
+        </form>
+      </div>
+      <div id="fine-list" style="margin-top:14px"></div>
+    </section>
+
+    <!-- ===== CENTRAL DE ALERTAS ===== -->
+    <section class="page" id="alerts-page">
+      <div class="page-header">
+        <div><h1 class="page-title">Central de Alertas</h1><p class="page-desc">Pendências e alertas do sistema</p></div>
+        <button class="btn btn-ghost" onclick="renderAlertsPage()">🔄 Atualizar</button>
+      </div>
+      <div id="alerts-content"></div>
+    </section>
+
+    <!-- ===== ANÁLISE AVANÇADA ===== -->
+    <section class="page" id="adv-reports-page">
+      <div class="page-header">
+        <div><h1 class="page-title">Análise Avançada</h1><p class="page-desc">Comparativos mensais, custo por km e ranking de veículos</p></div>
+        <button class="btn btn-ghost" onclick="renderAdvancedReports()">🔄 Atualizar</button>
+      </div>
+      <div id="adv-reports-content"></div>
+    </section>
+
+    <!-- ===== PERSONALIZAÇÃO (somente Administrador Geral) ===== -->
+    <section class="page" id="personalizacao-page">
+      <div class="page-header">
+        <div><h1 class="page-title">Personalização</h1><p class="page-desc">Identidade visual do sistema — nome, logotipo e cor. Sem nenhuma marca fixa: tudo aqui pode ser ajustado a qualquer momento.</p></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Identidade Visual</span></div>
+        <form id="branding-form" class="form-grid" onsubmit="submitBranding(event)">
+          <div class="field">
+            <label>Nome do Sistema *</label>
+            <input type="text" id="brand-app-name" required placeholder="Ex.: FrotaCTL">
+          </div>
+          <div class="field">
+            <label>Subtítulo</label>
+            <input type="text" id="brand-app-subtitle" placeholder="Ex.: Gestão de Frotas">
+          </div>
+          <div class="field">
+            <label>Cor Principal</label>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <input type="color" id="brand-primary-color" value="#0055FF" style="width:44px;height:36px;padding:2px;border-radius:6px;cursor:pointer;"
+                     oninput="document.getElementById('brand-primary-color-hex').value=this.value">
+              <input type="text" id="brand-primary-color-hex" placeholder="#0055FF" style="max-width:120px;"
+                     oninput="if(/^#[0-9a-fA-F]{6}$/.test(this.value)) document.getElementById('brand-primary-color').value=this.value">
+            </div>
+          </div>
+          <div class="field">
+            <label>Texto sobre a Cor Principal</label>
+            <select id="brand-text-on-accent">
+              <option value="auto">Automático (recomendado)</option>
+              <option value="light">Sempre claro (branco)</option>
+              <option value="dark">Sempre escuro (preto)</option>
+            </select>
+            <p style="font-size:0.76rem;color:var(--text-muted);margin-top:6px;">Controla a cor do texto/ícones sobre botões e itens que usam a Cor Principal como fundo (ex.: item ativo do menu, botão "Salvar"). Se a cor escolhida for muito clara ou muito escura, use esta opção para garantir a leitura.</p>
+          </div>
+          <div class="field">
+            <label>Rodapé dos Relatórios/PDFs</label>
+            <input type="text" id="brand-report-footer" placeholder="Deixe em branco para usar o Nome do Sistema">
+          </div>
+          <div class="field">
+            <label>Cor de Fundo da Barra Lateral</label>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <input type="color" id="brand-sidebar-bg" value="#00143D" style="width:44px;height:36px;padding:2px;border-radius:6px;cursor:pointer;"
+                     oninput="document.getElementById('brand-sidebar-bg-hex').value=this.value">
+              <input type="text" id="brand-sidebar-bg-hex" placeholder="#00143D" style="max-width:120px;"
+                     oninput="if(/^#[0-9a-fA-F]{6}$/.test(this.value)) document.getElementById('brand-sidebar-bg').value=this.value">
+            </div>
+          </div>
+          <div class="field">
+            <label>Cor das Letras da Barra Lateral</label>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <input type="color" id="brand-sidebar-text" value="#FFFFFF" style="width:44px;height:36px;padding:2px;border-radius:6px;cursor:pointer;"
+                     oninput="document.getElementById('brand-sidebar-text-hex').value=this.value">
+              <input type="text" id="brand-sidebar-text-hex" placeholder="#FFFFFF" style="max-width:120px;"
+                     oninput="if(/^#[0-9a-fA-F]{6}$/.test(this.value)) document.getElementById('brand-sidebar-text').value=this.value">
+            </div>
+          </div>
+          <div class="field fw">
+            <label>Logotipo</label>
+            <div style="display:flex;align-items:center;gap:14px;">
+              <div style="width:56px;height:56px;border-radius:10px;border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;background:var(--bg-surface-2);flex-shrink:0;">
+                <img id="brand-logo-preview" alt="Logotipo" style="display:none;max-width:100%;max-height:100%;object-fit:contain;">
+              </div>
+              <label class="btn btn-ghost btn-sm" style="cursor:pointer;">
+                ⬆ Selecionar Imagem
+                <input type="file" id="brand-logo-file" accept="image/*" style="display:none" onchange="handleBrandingLogoFile(this)">
+              </label>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="removeBrandingLogo()">Remover</button>
+            </div>
+            <p style="font-size:0.76rem;color:var(--text-muted);margin-top:6px;">PNG ou SVG com fundo transparente, até 2MB. Se nenhum logotipo for cadastrado, o sistema mostra as iniciais do nome.</p>
+          </div>
+          <div class="field fa">
+            <button type="submit" class="btn btn-primary">Salvar Personalização</button>
+            <button type="button" class="btn btn-ghost" onclick="resetBrandingToDefault()">Restaurar Padrão de Fábrica</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ===== EMPRESAS (somente Administrador Geral) ===== -->
+    <section class="page" id="companies-page">
+      <div class="page-header">
+        <div><h1 class="page-title">Empresas</h1><p class="page-desc">Cadastro das empresas atendidas pela plataforma (ambiente multiempresa)</p></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Nova Empresa</span></div>
+        <form id="company-form" class="form-grid" onsubmit="submitCompany(event)">
+          <div class="field"><label>Nome da Empresa *</label><input type="text" id="c-name" required></div>
+          <div class="field"><label>CNPJ</label><input type="text" id="c-cnpj"></div>
+          <div class="field fa">
+            <button type="submit" class="btn btn-primary" id="c-submit-btn">Cadastrar Empresa</button>
+            <button type="button" class="btn btn-ghost" onclick="resetCompanyForm()">Limpar</button>
+          </div>
+        </form>
+      </div>
+      <div id="company-list"></div>
+    </section>
+
+    <!-- ===== USUÁRIOS ===== -->
+    <section class="page" id="users-page">
+      <div class="page-header">
+        <div><h1 class="page-title">Usuários</h1><p class="page-desc">Contas de acesso e permissões do sistema</p></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Novo Usuário</span></div>
+        <form id="user-form" class="form-grid" onsubmit="submitUser(event)">
+          <div class="field"><label>Nome Completo *</label><input type="text" id="u-name" required onblur="applyNameCasing(this)"></div>
+          <div class="field"><label>Usuário (login) *</label><input type="text" id="u-username" required autocomplete="off"></div>
+          <div class="field"><label>Senha *</label><input type="password" id="u-password" required autocomplete="new-password" placeholder="Senha *"></div>
+          <div class="field"><label>Perfil *</label>
+            <select id="u-role" required onchange="renderPermissionMatrix(null); toggleUserEmpresaField();">
+              <option value="operador">Operador</option>
+              <option value="gestor">Gestor</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+          <div class="field" id="u-empresa-wrap" style="display:none;">
+            <label>Empresa *</label>
+            <select id="u-empresa"></select>
+          </div>
+          <div class="field fw">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+              <input type="checkbox" id="u-custom-perms" onchange="togglePermissionMatrix()" style="width:16px;height:16px;">
+              Usar permissões personalizadas para este usuário (em vez do padrão do perfil)
+            </label>
+          </div>
+          <div class="field fw" id="u-permission-matrix-wrap" style="display:none;">
+            <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;">Marque quais telas este usuário pode ver e editar. Administradores sempre têm acesso total.</p>
+            <div id="u-permission-matrix" style="overflow-x:auto;"></div>
+          </div>
+          <div class="field fa">
+            <button type="submit" class="btn btn-primary" id="u-submit-btn">Cadastrar Usuário</button>
+            <button type="button" class="btn btn-ghost" onclick="resetUserForm()">Limpar</button>
+          </div>
+        </form>
+      </div>
+      <div id="user-list"></div>
+
+      <div class="panel" style="margin-top:14px;">
+        <div class="panel-header"><span class="panel-title">Perfis Padrão</span></div>
+        <p style="font-size:0.8rem;color:var(--text-muted);padding:0 20px;margin:10px 0 10px;">
+          Defina o que cada perfil pode ver e editar por padrão. Essas regras valem para todos os usuários
+          daquele perfil que não tiverem permissões personalizadas (aba "Usar permissões personalizadas" acima).
+        </p>
+        <div class="form-grid">
+          <div class="field"><label>Perfil</label>
+            <select id="rd-role" onchange="renderRoleDefaultsMatrix()">
+              <option value="gestor">Gestor</option>
+              <option value="operador">Operador</option>
+              <option value="colaborador">Colaborador</option>
+            </select>
+          </div>
+          <div class="field fw" id="rd-matrix-wrap" style="overflow-x:auto;"></div>
+          <div class="field fa">
+            <button type="button" class="btn btn-primary" onclick="saveRoleDefaults()">Salvar Perfil Padrão</button>
+            <button type="button" class="btn btn-ghost" onclick="resetRoleDefaultsToFactory()">Restaurar Padrão de Fábrica</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== AUDITORIA ===== -->
+    <section class="page" id="audit-page">
+      <div class="page-header">
+        <div><h1 class="page-title">Auditoria</h1><p class="page-desc">Histórico de ações realizadas no sistema</p></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Filtros</span></div>
+        <div class="form-grid">
+          <div class="field"><label>Usuário</label><select id="aud-user-filter" onchange="renderAuditLog()"><option value="">Todos os usuários</option></select></div>
+          <div class="field"><label>Tipo de Registro</label>
+            <select id="aud-entity-filter" onchange="renderAuditLog()">
+              <option value="">Todos</option>
+              <option value="vehicle">Veículo</option>
+              <option value="driver">Motorista</option>
+              <option value="trip">Viagem</option>
+              <option value="trip-approval">Aprovação de Viagem</option>
+              <option value="user">Usuário</option>
+              <option value="session">Sessão (login/logout)</option>
+            </select>
+          </div>
+          <div class="field"><label>De</label><input type="date" id="aud-date-from" onchange="renderAuditLog()"></div>
+          <div class="field"><label>Até</label><input type="date" id="aud-date-to" onchange="renderAuditLog()"></div>
+          <div class="field fa"><button type="button" class="btn btn-ghost" onclick="resetAuditFilters()">Limpar Filtros</button></div>
+        </div>
+      </div>
+      <div id="audit-log-list"></div>
+    </section>
+
+    <!-- ===== BACKUP & RESTAURAÇÃO ===== -->
+    <section class="page" id="backup-page">
+      <div class="page-header">
+        <div><h1 class="page-title">Backup & Restauração</h1><p class="page-desc">Exporte e importe todos os dados do sistema</p></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Exportar Backup</span></div>
+        <div class="panel-body" style="display:flex;flex-direction:column;gap:12px;">
+          <p style="font-size:0.88rem;color:var(--text-secondary);line-height:1.6;">Gera um arquivo <strong>.json</strong> com todos os dados do sistema (veículos, motoristas, atribuições, abastecimentos, manutenções, trocas de óleo e mais). Guarde em local seguro.</p>
+          <button class="btn btn-primary" onclick="exportBackup()" style="align-self:flex-start">⬇ Exportar Backup Completo</button>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:14px">
+        <div class="panel-header"><span class="panel-title">Importar / Restaurar</span></div>
+        <div class="panel-body" style="display:flex;flex-direction:column;gap:12px;">
+          <p style="font-size:0.88rem;color:var(--text-secondary);line-height:1.6;"><strong style="color:#EF4444;">⚠ Atenção:</strong> a importação substituirá <strong>todos</strong> os dados atuais pelo conteúdo do arquivo selecionado. Certifique-se de ter um backup antes.</p>
+          <label class="btn btn-ghost" style="cursor:pointer;align-self:flex-start">
+            ⬆ Selecionar Arquivo de Backup
+            <input type="file" accept=".json" style="display:none" onchange="importBackup(this)">
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <footer class="app-signature">
+      Desenvolvido por Leonardo Costellini © 2026. Todos os direitos reservados.
+    </footer>
+
+  </main>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MODAL -->
+<!-- BRIEFCASE SIGNATURE MODAL -->
+<div class="modal-overlay" id="briefcase-signature-modal-overlay" onclick="if(event.target===this) closeBriefcaseSignatureModal()">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <span class="modal-title">Termo de Responsabilidade da Maleta</span>
+      <button class="modal-close" onclick="closeBriefcaseSignatureModal()">✕</button>
+    </div>
+    <div class="modal-body" style="padding:18px 22px;">
+      <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:14px;" id="bf-sig-driver-name"></p>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:14px;">Este termo é válido até o fim da semana atual. Uma nova assinatura será solicitada na próxima segunda-feira.</p>
+      <label style="display:block;margin-bottom:6px;">Assinatura do Técnico</label>
+      <div class="signature-pad-wrap">
+        <canvas id="briefcase-signature-canvas" width="420" height="150"></canvas>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button type="button" class="btn btn-ghost btn-sm" onclick="clearBriefcaseSignature()">Limpar Assinatura</button>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="confirmBriefcaseSignature()">Confirmar Assinatura</button>
+      <button class="btn btn-ghost" onclick="closeBriefcaseSignatureModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ASSINATURA DO TÉCNICO: ITENS FALTANDO NA CONFERÊNCIA -->
+<div class="modal-overlay" id="missing-signature-modal-overlay" onclick="if(event.target===this) closeMissingItemsSignatureModal()">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <span class="modal-title">Itens Faltando — Assinatura do Técnico</span>
+      <button class="modal-close" onclick="closeMissingItemsSignatureModal()">✕</button>
+    </div>
+    <div class="modal-body" style="padding:18px 22px;">
+      <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:10px;" id="miss-sig-driver-name"></p>
+      <div id="miss-sig-items" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;"></div>
+      <label style="display:block;margin-bottom:6px;">Assinatura do Técnico</label>
+      <div class="signature-pad-wrap">
+        <canvas id="missing-signature-canvas" width="420" height="150"></canvas>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button type="button" class="btn btn-ghost btn-sm" onclick="clearMissingSignature()">Limpar Assinatura</button>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="confirmMissingItemsSignature()">Confirmar Assinatura</button>
+      <button class="btn btn-ghost" onclick="closeMissingItemsSignatureModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ASSINATURA DO GESTOR/ADMINISTRADOR: DEVOLUÇÃO DE ITEM FALTANDO -->
+<div class="modal-overlay" id="resolve-signature-modal-overlay" onclick="if(event.target===this) closeResolveItemSignatureModal()">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <span class="modal-title">Devolução do Item — Assinatura</span>
+      <button class="modal-close" onclick="closeResolveItemSignatureModal()">✕</button>
+    </div>
+    <div class="modal-body" style="padding:18px 22px;">
+      <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:14px;" id="resolve-sig-title"></p>
+      <label style="display:block;margin-bottom:6px;">Assinatura de quem registra a devolução</label>
+      <div class="signature-pad-wrap">
+        <canvas id="resolve-signature-canvas" width="420" height="150"></canvas>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button type="button" class="btn btn-ghost btn-sm" onclick="clearResolveSignature()">Limpar Assinatura</button>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="confirmResolveItemSignature()">Confirmar Assinatura</button>
+      <button class="btn btn-ghost" onclick="closeResolveItemSignatureModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKLIST MODAL -->
+<div class="modal-overlay" id="checklist-modal-overlay" onclick="if(event.target===this) closeChecklistModal()">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header">
+      <span class="modal-title">Checklist Digital do Veículo</span>
+      <button class="modal-close" onclick="closeChecklistModal()">✕</button>
+    </div>
+    <div class="modal-body" style="padding:18px 22px;">
+      <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:14px;">Confira todos os itens antes de iniciar a viagem.</p>
+      <div class="checklist-grid" id="checklist-items-grid"></div>
+
+      <div class="field" style="margin:16px 0 12px;">
+        <label>Observações</label>
+        <textarea id="chk-observations" placeholder="Alguma observação sobre o estado do veículo? (opcional)"></textarea>
+      </div>
+
+      <div class="field" style="margin-bottom:14px;">
+        <label>Fotos do Veículo (opcional)</label>
+        <input type="file" id="chk-photo-input" accept="image/*" multiple onchange="handleChecklistPhotos(this)">
+        <div class="checklist-photo-grid" id="chk-photo-preview"></div>
+      </div>
+
+      <label style="display:block;margin-bottom:6px;">Assinatura do Motorista</label>
+      <div class="signature-pad-wrap">
+        <canvas id="checklist-signature-canvas" width="420" height="150"></canvas>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button type="button" class="btn btn-ghost btn-sm" onclick="clearChecklistSignature()">Limpar Assinatura</button>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="confirmChecklist()">Confirmar Checklist e Iniciar Viagem</button>
+      <button class="btn btn-ghost" onclick="closeChecklistModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- SIGNATURE MODAL -->
+<div class="modal-overlay" id="signature-modal-overlay" onclick="if(event.target===this) closeSignatureModal()">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <span class="modal-title">Assinatura do Técnico</span>
+      <button class="modal-close" onclick="closeSignatureModal()">✕</button>
+    </div>
+    <div class="modal-body" style="padding:18px 22px;">
+      <div class="field" style="margin-bottom:12px;">
+        <label>Comentários do Técnico</label>
+        <textarea id="sig-comment" placeholder="Observações sobre a prestação de contas (opcional)"></textarea>
+      </div>
+      <label style="display:block;margin-bottom:6px;">Assine no campo abaixo</label>
+      <div class="signature-pad-wrap">
+        <canvas id="signature-canvas" width="420" height="160"></canvas>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button type="button" class="btn btn-ghost btn-sm" onclick="clearSignature()">Limpar Assinatura</button>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="confirmSignature()">Confirmar e Enviar para Aprovação</button>
+      <button class="btn btn-ghost" onclick="closeSignatureModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Editar</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script src="app.js?v=20260729a"></script>
+</body>
+</html>
